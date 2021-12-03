@@ -23,6 +23,13 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+#Custom files for ignoring
+__pycache__
+.vscode
+.idea
+Thumbs.db
+.DS_Store
+.env
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
