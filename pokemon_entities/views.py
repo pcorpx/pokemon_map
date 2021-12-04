@@ -38,13 +38,14 @@ def show_all_pokemons(request):
         )
 
     pokemons_on_page = []
+    pokemons = Pokemon.objects.all()
     for pokemon in pokemons:
         pokemons_on_page.append({
-            'pokemon_id': pokemon.pokemon.id,
+            'pokemon_id': pokemon.id,
             'img_url': request.build_absolute_uri(
-                pokemon.pokemon.photo.url
+                pokemon.photo.url
             ),
-            'title_ru': pokemon.pokemon.title,
+            'title_ru': pokemon.title,
         })
 
     return render(request, 'mainpage.html', context={
