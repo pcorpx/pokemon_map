@@ -70,6 +70,16 @@ def show_pokemon(request, pokemon_id):
     pokemon_img_url = request.build_absolute_uri(requested_pokemon.photo.url)
     pokemon['img_url'] = pokemon_img_url
     pokemon['description'] = requested_pokemon.description
+    if requested_pokemon.previous_evolution:
+        pokemon['previous_evolution'] = {}
+        pokemon['previous_evolution']['pokemon_id'] = (
+            requested_pokemon.previous_evolution.id
+        )
+        pokemon['previous_evolution']['title_ru'] = (
+            requested_pokemon.previous_evolution.title
+        )
+        parent_pokemon_img_url = requested_pokemon.previous_evolution.photo.url
+        pokemon['previous_evolution']['img_url'] = parent_pokemon_img_url
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in pokemon_entities:
