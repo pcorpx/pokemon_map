@@ -56,7 +56,7 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     try:
-        requested_pokemon = Pokemon.objects.get(id=pokemon_id)
+        chosen_pokemon = Pokemon.objects.get(id=pokemon_id)
         pokemon_entities = PokemonEntity.objects.filter(
             pokemon__id=pokemon_id
         )
@@ -64,22 +64,26 @@ def show_pokemon(request, pokemon_id):
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     pokemon = {}
-    pokemon['title_ru'] = requested_pokemon.title
-    pokemon['title_en'] = requested_pokemon.title_en
-    pokemon['title_jp'] = requested_pokemon.title_jp
-    pokemon_img_url = request.build_absolute_uri(requested_pokemon.photo.url)
+    pokemon['title_ru'] = chosen_pokemon.title
+    pokemon['title_en'] = chosen_pokemon.title_en
+    pokemon['title_jp'] = chosen_pokemon.title_jp
+    pokemon_img_url = request.build_absolute_uri(chosen_pokemon.photo.url)
     pokemon['img_url'] = pokemon_img_url
-    pokemon['description'] = requested_pokemon.description
-    if requested_pokemon.previous_evolution:
+    pokemon['description'] = chosen_pokemon.description
+
+    parent_pokemon = chosen_pokemon.previous_evolution
+    if parent_pokemon:
         pokemon['previous_evolution'] = {}
-        pokemon['previous_evolution']['pokemon_id'] = (
-            requested_pokemon.previous_evolution.id
-        )
-        pokemon['previous_evolution']['title_ru'] = (
-            requested_pokemon.previous_evolution.title
-        )
-        parent_pokemon_img_url = requested_pokemon.previous_evolution.photo.url
-        pokemon['previous_evolution']['img_url'] = parent_pokemon_img_url
+        pokemon['previous_evolution']['pokemon_id'] = parent_pokemon.id
+        pokemon['previous_evolution']['title_ru'] = parent_pokemon.title
+        pokemon['previous_evolution']['img_url'] = parent_pokemon.photo.url
+
+    child_pokemon = chosen_pokemon.next_evolution.first()
+    if child_pokemon:
+        pokemon['next_evolution'] = {}
+        pokemon['next_evolution']['pokemon_id'] = child_pokemon.id
+        pokemon['next_evolution']['title_ru'] = child_pokemon.title
+        pokemon['next_evolution']['img_url'] = child_pokemon.photo.url
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in pokemon_entities:
