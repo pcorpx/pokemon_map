@@ -65,6 +65,8 @@ def show_pokemon(request, pokemon_id):
 
     pokemon = {}
     pokemon['title_ru'] = requested_pokemon.title
+    pokemon['title_en'] = requested_pokemon.title_en
+    pokemon['title_jp'] = requested_pokemon.title_jp
     pokemon_img_url = request.build_absolute_uri(requested_pokemon.photo.url)
     pokemon['img_url'] = pokemon_img_url
     pokemon['description'] = requested_pokemon.description
