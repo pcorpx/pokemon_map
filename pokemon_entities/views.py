@@ -61,27 +61,35 @@ def show_pokemon(request, pokemon_id):
     except Pokemon.DoesNotExist:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
-    pokemon = {}
-    pokemon['title_ru'] = chosen_pokemon.title
-    pokemon['title_en'] = chosen_pokemon.title_en
-    pokemon['title_jp'] = chosen_pokemon.title_jp
-    pokemon_img_url = request.build_absolute_uri(chosen_pokemon.photo.url)
-    pokemon['img_url'] = pokemon_img_url
-    pokemon['description'] = chosen_pokemon.description
-
     parent_pokemon = chosen_pokemon.previous_evolution
     if parent_pokemon:
-        pokemon['previous_evolution'] = {}
-        pokemon['previous_evolution']['pokemon_id'] = parent_pokemon.id
-        pokemon['previous_evolution']['title_ru'] = parent_pokemon.title
-        pokemon['previous_evolution']['img_url'] = parent_pokemon.photo.url
+        previous_evolution = {
+            'pokemon_id': parent_pokemon.id,
+            'title_ru': parent_pokemon.title,
+            'img_url': parent_pokemon.photo.url,
+        }
+    else:
+        previous_evolution = {}
 
     child_pokemon = chosen_pokemon.next_evolution.first()
     if child_pokemon:
-        pokemon['next_evolution'] = {}
-        pokemon['next_evolution']['pokemon_id'] = child_pokemon.id
-        pokemon['next_evolution']['title_ru'] = child_pokemon.title
-        pokemon['next_evolution']['img_url'] = child_pokemon.photo.url
+        next_evolution = {
+            'pokemon_id': child_pokemon.id,
+            'title_ru': child_pokemon.title,
+            'img_url': child_pokemon.photo.url,
+        }
+    else:
+        next_evolution = {}
+
+    pokemon = {
+        'title_ru': chosen_pokemon.title,
+        'title_en': chosen_pokemon.title_en,
+        'title_jp': chosen_pokemon.title_jp,
+        'img_url': request.build_absolute_uri(chosen_pokemon.photo.url),
+        'description': chosen_pokemon.description,
+        'previous_evolution': previous_evolution,
+        'next_evolution': next_evolution,
+    }
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in pokemon_entities:
@@ -89,7 +97,7 @@ def show_pokemon(request, pokemon_id):
             folium_map,
             pokemon_entity.lat,
             pokemon_entity.lon,
-            pokemon_img_url
+            request.build_absolute_uri(chosen_pokemon.photo.url),
         )
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': pokemon
