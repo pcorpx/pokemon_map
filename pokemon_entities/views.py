@@ -57,9 +57,7 @@ def show_all_pokemons(request):
 def show_pokemon(request, pokemon_id):
     try:
         chosen_pokemon = Pokemon.objects.get(id=pokemon_id)
-        pokemon_entities = PokemonEntity.objects.filter(
-            pokemon__id=pokemon_id
-        )
+        pokemon_entities = chosen_pokemon.pokemon_entities.all()
     except Pokemon.DoesNotExist:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
